@@ -11,7 +11,8 @@
     "node-fetch": "^3.2.0"
   },
   "scripts": {
-    "start": "ts-node ."
+    "start": "node dist/index.js",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
