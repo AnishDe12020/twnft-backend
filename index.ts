@@ -97,6 +97,19 @@ app.post("/mint", async (req, res) => {
           ],
         };
 
+        const nftCollectionRef = db.collection("nft");
+
+        const firebaseRes = await nftCollectionRef.doc(tweetId).set({
+          ...nftMedatada,
+          created_date: new Date().toISOString(),
+          creatorAddress: payload.receiverAddress,
+          tweetId: tweetId,
+          tweetUrl: tweetUrl,
+          tweetOwnerId: tweetAuthordId,
+        });
+
+        res.send({ data: { ...firebaseRes } });
+
         const sdk = new ThirdwebSDK(
           new ethers.Wallet(
             process.env.PRIVATE_KEY,
@@ -113,17 +126,10 @@ app.post("/mint", async (req, res) => {
           nftMedatada
         );
 
-        const nftCollectionRef = db.collection("nft");
-        const firebaseRes = await nftCollectionRef.doc(tweetId).set({
-          ...nftMedatada,
-          created_date: new Date().toISOString(),
-          creatorAddress: payload.receiverAddress,
-          tweetId: tweetId,
-          tweetUrl: tweetUrl,
-          tweetOwnerId: tweetAuthordId,
-        });
+        const tweetNftRef = db.collection("nft").doc(tweetId);
+        await tweetNftRef.update({ tokenId: result.id });
 
-        res.send({ data: { result, firebaseRes } });
+        console.log(result);
       } else {
         res.send({ error: "tweetMinted" });
       }
